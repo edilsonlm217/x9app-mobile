@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, Alert, ToastAndroid } from 'react-native';
 import { StackActions } from '@react-navigation/native';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
+import Spinner from 'react-native-loading-spinner-overlay';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-export default function ClientEnrollmentScreen({ navigation }) {
+import api from '../../services/api';
+
+export default function ClientEnrollmentScreen({ navigation, route }) {
   const [date, setDate] = useState(new Date());
+  const [payment, setPayment] = useState('');
+
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
 
-  const onChange = (event, selectedDate) => {
+  const [isLoading, setIsloading] = useState(false);
+
+  const onChange = ({ selectedDate }) => {
     const currentDate = selectedDate || date;
     setShow(Platform.OS === 'ios');
     setDate(currentDate);
@@ -25,8 +32,35 @@ export default function ClientEnrollmentScreen({ navigation }) {
     showMode('date');
   };
 
-  function handleNextPage() {
-    navigation.dispatch(StackActions.popToTop());
+  async function handleNextPage() {
+    const { name, phone, email, street, number, neighborhood, } = route.params;
+
+    if (payment === '') {
+      return Alert.alert('Erro', 'Todos os campos são obrigatórios');
+      ;
+    }
+
+    try {
+      setIsloading(true);
+
+      await api.post('clients', {
+        name,
+        phone,
+        email,
+        street,
+        number,
+        neighborhood,
+        due_date_day: date,
+        monthly_payment: payment,
+      });
+
+      setIsloading(false);
+      ToastAndroid.show("Salvo com sucesso", ToastAndroid.SHORT);
+      navigation.dispatch(StackActions.popToTop());
+    } catch {
+      setIsloading(false);
+      Alert.alert('Ops...', 'Não foi possível salvar este aluno no servidor');
+    }
   }
 
   return (
@@ -47,7 +81,12 @@ export default function ClientEnrollmentScreen({ navigation }) {
 
       <View style={styles.input_container}>
         <MIcon name="attach-money" size={22} color="#555555" />
-        <TextInput placeholder="Valor da mensalidade" style={styles.input_style} />
+        <TextInput
+          style={styles.input_style}
+          placeholder="Valor da mensalidade"
+          value={payment}
+          onChangeText={text => setPayment(text)}
+        />
       </View>
 
       <TouchableOpacity onPress={() => handleNextPage()} style={styles.next_btn}>
@@ -65,6 +104,11 @@ export default function ClientEnrollmentScreen({ navigation }) {
         />
       )}
 
+      <Spinner
+        visible={isLoading}
+        textContent={'Cadastrando...'}
+        textStyle={styles.spinnerTextStyle}
+      />
     </View>
   );
 }
@@ -108,5 +152,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Bold',
     fontSize: 14,
     color: '#F7F7F7'
+  },
+
+  spinnerTextStyle: {
+    color: '#FFF'
   },
 });
