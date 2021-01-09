@@ -17,7 +17,7 @@ export default function ClientEnrollmentScreen({ navigation, route }) {
 
   const [isLoading, setIsloading] = useState(false);
 
-  const onChange = ({ selectedDate }) => {
+  const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(Platform.OS === 'ios');
     setDate(currentDate);
