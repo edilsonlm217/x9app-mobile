@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
 import UserAvatar from 'react-native-user-avatar';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 
 export default function DefaultersScreen() {
   const windowHeight = Dimensions.get('window').height * 0.19;
+
+  const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   return (
     <View style={styles.page_container}>
@@ -12,20 +14,21 @@ export default function DefaultersScreen() {
         <Text style={styles.header_label}>Alunos em atraso</Text>
       </View>
 
-      <View style={{ margin: 10, marginTop: -30 }}>
+      <ScrollView style={{ margin: 10, marginTop: -30 }}>
 
-        <TouchableOpacity style={styles.card_style}>
-          <View style={styles.content_container}>
-            <UserAvatar size={40} name="Avishay Bar" />
-            <View style={styles.text_container}>
-              <Text style={styles.main_line}>Edilson Rocha Lima</Text>
-              <Text style={styles.sub_line}>2 mensalidades vencidas</Text>
+        {data.map(item => (
+          <TouchableOpacity key={item} style={styles.card_style}>
+            <View style={styles.content_container}>
+              <UserAvatar size={40} name="Avishay Bar" />
+              <View style={styles.text_container}>
+                <Text style={styles.main_line}>Edilson Rocha Lima</Text>
+                <Text style={styles.sub_line}>2 mensalidades vencidas</Text>
+              </View>
             </View>
-          </View>
-          <MIcon name="chevron-right" size={22} color="#222222" />
-        </TouchableOpacity>
-
-      </View>
+            <MIcon name="chevron-right" size={22} color="#222222" />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -56,7 +59,8 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderRadius: 5
+    borderRadius: 5,
+    marginBottom: 10,
   },
 
   main_line: { fontFamily: 'Roboto-Bold', fontSize: 14 },
