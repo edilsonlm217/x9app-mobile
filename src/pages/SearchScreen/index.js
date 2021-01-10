@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions, Alert, FlatList, Image } from 'react-native';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
+
 import api from '../../services/api';
+import no_content from '../../assets/no_content.jpg';
 
 export default function SearchScreen() {
   const windowHeight = Dimensions.get('window').height * 0.19;
@@ -12,29 +14,8 @@ export default function SearchScreen() {
 
   const [loading, setLoading] = useState(false);
 
-  function handlePullToRefresh() {
-    if (searchTerm !== '') {
-      handleSearching();
-    } else {
-      fetchClients();
-    }
-  }
-
-  async function handleSearching() {
-    try {
-      setLoading(true);
-
-      const response = await api.get(`search?search_term=${searchTerm}`);
-
-      setSearchResult(response.data);
-
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-      setLoading(false);
-      Alert.alert('Erro', 'Não foi possível buscar!');
-    }
-  }
+  useEffect(() => { searchTerm === '' ? fetchClients() : null }, [searchTerm]);
+  useEffect(() => { fetchClients(); }, []);
 
   async function fetchClients() {
     try {
@@ -50,9 +31,46 @@ export default function SearchScreen() {
     }
   }
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
+  async function handleSearching() {
+    if (searchTerm !== '') {
+      try {
+        setLoading(true);
+
+        const response = await api.get(`search?search_term=${searchTerm}`);
+
+        if (response.data.length !== 0) {
+          setSearchResult(response.data);
+          setLoading(false);
+        } else {
+          setSearchResult(response.data);
+          setNoContent(true);
+          setLoading(false);
+        }
+
+      } catch (err) {
+        console.log(err);
+        setLoading(false);
+        Alert.alert('Erro', 'Não foi possível buscar!');
+      }
+    } else {
+      Alert.alert('Ops...', 'Informe algo antes de pesquisar');
+    }
+
+
+  }
+
+  function handlePullToRefresh() {
+    if (searchTerm !== '') {
+      handleSearching();
+    } else {
+      fetchClients();
+    }
+  }
+
+  function clearSearchTerm() {
+    SetsearchTerm('');
+    setNoContent(false);
+  }
 
   return (
     <View style={styles.page_container}>
@@ -68,6 +86,14 @@ export default function SearchScreen() {
             placeholder="Buscar por"
             style={styles.text_input}
           />
+
+          {searchTerm !== ''
+            &&
+            <TouchableOpacity onPress={() => clearSearchTerm()} style={{ alignSelf: 'center', marginRight: 15 }}>
+              <MIcon name="close" size={16} color="#000" />
+            </TouchableOpacity>
+          }
+
           <TouchableOpacity onPress={() => handleSearching()} style={styles.search_btn}>
             <MIcon name="search" size={22} color="#F7F7F7" />
           </TouchableOpacity>
@@ -75,24 +101,33 @@ export default function SearchScreen() {
       </View>
 
       <View style={styles.section_container}>
-        <View style={styles.flatlist_container} >
-          <FlatList
-            data={searchResult}
-            keyExtractor={item => item.name}
-            ItemSeparatorComponent={() => (
-              <View style={styles.separator_style} />
-            )}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.search_result_btn}>
-                <Text>{item.name}</Text>
-                <MIcon name="chevron-right" size={22} color="#222222" />
-              </TouchableOpacity>
-            )}
-            refreshing={loading}
-            onRefresh={() => handlePullToRefresh()}
-          />
-        </View>
-
+        {noContent
+          ?
+          <>
+            <Image source={no_content} style={{ width: 150, height: 150, alignSelf: 'center', marginTop: 60 }} />
+            <Text style={{ alignSelf: 'center', fontFamily: 'Roboto-Light', marginTop: 10 }}>
+              Nenhum resultado encontrado
+            </Text>
+          </>
+          :
+          <View style={styles.flatlist_container}>
+            <FlatList
+              data={searchResult}
+              keyExtractor={item => item.name}
+              ItemSeparatorComponent={() => (
+                <View style={styles.separator_style} />
+              )}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.search_result_btn}>
+                  <Text>{item.name}</Text>
+                  <MIcon name="chevron-right" size={22} color="#222222" />
+                </TouchableOpacity>
+              )}
+              refreshing={loading}
+              onRefresh={() => handlePullToRefresh()}
+            />
+          </View>
+        }
       </View>
     </View>
   );
