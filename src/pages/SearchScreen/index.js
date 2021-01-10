@@ -8,8 +8,33 @@ export default function SearchScreen() {
 
   const [searchResult, setSearchResult] = useState([]);
   const [noContent, setNoContent] = useState(false);
+  const [searchTerm, SetsearchTerm] = useState('');
 
   const [loading, setLoading] = useState(false);
+
+  function handlePullToRefresh() {
+    if (searchTerm !== '') {
+      handleSearching();
+    } else {
+      fetchClients();
+    }
+  }
+
+  async function handleSearching() {
+    try {
+      setLoading(true);
+
+      const response = await api.get(`search?search_term=${searchTerm}`);
+
+      setSearchResult(response.data);
+
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+      Alert.alert('Erro', 'Não foi possível buscar!');
+    }
+  }
 
   async function fetchClients() {
     try {
@@ -32,13 +57,18 @@ export default function SearchScreen() {
   return (
     <View style={styles.page_container}>
       <View style={[styles.page_header, { height: windowHeight }]}>
-        <Text style={styles.header_label}>Buscar alunos</Text>
+        <Text style={styles.header_label}>Meus alunos</Text>
       </View>
 
       <View style={styles.search_bar_container}>
         <View style={styles.search_bar}>
-          <TextInput placeholder="Buscar por" style={styles.text_input} />
-          <TouchableOpacity style={styles.search_btn}>
+          <TextInput
+            value={searchTerm}
+            onChangeText={text => SetsearchTerm(text)}
+            placeholder="Buscar por"
+            style={styles.text_input}
+          />
+          <TouchableOpacity onPress={() => handleSearching()} style={styles.search_btn}>
             <MIcon name="search" size={22} color="#F7F7F7" />
           </TouchableOpacity>
         </View>
@@ -48,7 +78,7 @@ export default function SearchScreen() {
         <View style={styles.flatlist_container} >
           <FlatList
             data={searchResult}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.name}
             ItemSeparatorComponent={() => (
               <View style={styles.separator_style} />
             )}
@@ -59,7 +89,7 @@ export default function SearchScreen() {
               </TouchableOpacity>
             )}
             refreshing={loading}
-            onRefresh={() => fetchClients()}
+            onRefresh={() => handlePullToRefresh()}
           />
         </View>
 
