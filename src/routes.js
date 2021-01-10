@@ -35,7 +35,7 @@ function AppTabs() {
       />
 
       <Tab.Screen
-        name="Buscar alunos"
+        name="Meus Alunos"
         component={SearchScreen}
         keyboard
         options={{
