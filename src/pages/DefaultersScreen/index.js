@@ -5,7 +5,7 @@ import MIcon from 'react-native-vector-icons/MaterialIcons';
 
 import api from '../../services/api';
 
-export default function DefaultersScreen() {
+export default function DefaultersScreen({ navigation }) {
   const windowHeight = Dimensions.get('window').height * 0.19;
 
   const [loading, setLoading] = useState(false);
@@ -29,6 +29,12 @@ export default function DefaultersScreen() {
     }
   }
 
+  function handleNavigate(client_name) {
+    navigation.navigate('ClientDetails', {
+      name: client_name,
+    });
+  }
+
   return (
     <View style={styles.page_container}>
       <View style={[styles.page_header, { height: windowHeight }]}>
@@ -42,7 +48,11 @@ export default function DefaultersScreen() {
         }
       >
         {defaulters.map(item => (
-          <TouchableOpacity key={item.id} style={styles.card_style}>
+          <TouchableOpacity
+            key={item.id}
+            onPress={() => handleNavigate(item.name)}
+            style={styles.card_style}
+          >
             <View style={styles.content_container}>
               <UserAvatar size={40} name={item.name} />
               <View style={styles.text_container}>
