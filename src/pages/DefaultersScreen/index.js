@@ -1,12 +1,33 @@
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import UserAvatar from 'react-native-user-avatar';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
+
+import api from '../../services/api';
 
 export default function DefaultersScreen() {
   const windowHeight = Dimensions.get('window').height * 0.19;
 
-  const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const [loading, setLoading] = useState(false);
+  const [defaulters, setDefaulters] = useState([]);
+
+  useEffect(() => { fetchDefaulters() }, []);
+
+  async function fetchDefaulters() {
+    const today = new Date().setUTCHours(0);
+
+    try {
+      setLoading(true);
+
+      const response = await api.get(`defaulters?today=${today.toString()}`);
+
+      setDefaulters(response.data);
+      setLoading(false);
+    } catch {
+      setLoading(false);
+      Alert.alert('Ops...', 'Não foi possível carregar. Tente novamente!');
+    }
+  }
 
   return (
     <View style={styles.page_container}>
@@ -16,13 +37,18 @@ export default function DefaultersScreen() {
 
       <ScrollView style={{ margin: 10, marginTop: -30 }}>
 
-        {data.map(item => (
-          <TouchableOpacity key={item} style={styles.card_style}>
+        {defaulters.map(item => (
+          <TouchableOpacity key={item.id} style={styles.card_style}>
             <View style={styles.content_container}>
-              <UserAvatar size={40} name="Avishay Bar" />
+              <UserAvatar size={40} name={item.name} />
               <View style={styles.text_container}>
-                <Text style={styles.main_line}>Edilson Rocha Lima</Text>
-                <Text style={styles.sub_line}>2 mensalidades vencidas</Text>
+                <Text style={styles.main_line}>{item.name}</Text>
+                <Text style={styles.sub_line}>
+                  {item.overdue_invoice_count > 1
+                    ? `${item.overdue_invoice_count} mensalidades vencidas`
+                    : `${item.overdue_invoice_count} mensalidade vencida`
+                  }
+                </Text>
               </View>
             </View>
             <MIcon name="chevron-right" size={22} color="#222222" />
