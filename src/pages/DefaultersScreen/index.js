@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Alert, RefreshControl } from 'react-native';
 import UserAvatar from 'react-native-user-avatar';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 
@@ -35,8 +35,12 @@ export default function DefaultersScreen() {
         <Text style={styles.header_label}>Alunos em atraso</Text>
       </View>
 
-      <ScrollView style={{ margin: 10, marginTop: -30 }}>
-
+      <ScrollView
+        style={{ margin: 10, marginTop: -30 }}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={() => fetchDefaulters()} />
+        }
+      >
         {defaulters.map(item => (
           <TouchableOpacity key={item.id} style={styles.card_style}>
             <View style={styles.content_container}>
@@ -55,7 +59,7 @@ export default function DefaultersScreen() {
           </TouchableOpacity>
         ))}
       </ScrollView>
-    </View>
+    </View >
   );
 }
 
