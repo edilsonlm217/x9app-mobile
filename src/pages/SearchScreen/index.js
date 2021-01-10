@@ -5,7 +5,7 @@ import MIcon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 import no_content from '../../assets/no_content.jpg';
 
-export default function SearchScreen() {
+export default function SearchScreen({ navigation }) {
   const windowHeight = Dimensions.get('window').height * 0.19;
 
   const [searchResult, setSearchResult] = useState([]);
@@ -55,8 +55,6 @@ export default function SearchScreen() {
     } else {
       Alert.alert('Ops...', 'Informe algo antes de pesquisar');
     }
-
-
   }
 
   function handlePullToRefresh() {
@@ -70,6 +68,12 @@ export default function SearchScreen() {
   function clearSearchTerm() {
     SetsearchTerm('');
     setNoContent(false);
+  }
+
+  function handleNavigate(client_name) {
+    navigation.navigate('ClientDetails', {
+      name: client_name,
+    });
   }
 
   return (
@@ -118,7 +122,7 @@ export default function SearchScreen() {
                 <View style={styles.separator_style} />
               )}
               renderItem={({ item }) => (
-                <TouchableOpacity style={styles.search_result_btn}>
+                <TouchableOpacity onPress={() => handleNavigate(item.name)} style={styles.search_result_btn}>
                   <Text>{item.name}</Text>
                   <MIcon name="chevron-right" size={22} color="#222222" />
                 </TouchableOpacity>
