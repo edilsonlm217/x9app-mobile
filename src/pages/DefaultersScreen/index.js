@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import UserAvatar from 'react-native-user-avatar';
+import MIcon from 'react-native-vector-icons/MaterialIcons';
 
 export default function DefaultersScreen() {
   const windowHeight = Dimensions.get('window').height * 0.19;
@@ -8,6 +10,21 @@ export default function DefaultersScreen() {
     <View style={styles.page_container}>
       <View style={[styles.page_header, { height: windowHeight }]}>
         <Text style={styles.header_label}>Alunos em atraso</Text>
+      </View>
+
+      <View style={{ margin: 10, marginTop: -30 }}>
+
+        <TouchableOpacity style={styles.card_style}>
+          <View style={styles.content_container}>
+            <UserAvatar size={40} name="Avishay Bar" />
+            <View style={styles.text_container}>
+              <Text style={styles.main_line}>Edilson Rocha Lima</Text>
+              <Text style={styles.sub_line}>2 mensalidades vencidas</Text>
+            </View>
+          </View>
+          <MIcon name="chevron-right" size={22} color="#222222" />
+        </TouchableOpacity>
+
       </View>
     </View>
   );
@@ -32,4 +49,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     zIndex: 1,
   },
+
+  card_style: {
+    backgroundColor: '#FFF',
+    flexDirection: 'row',
+    padding: 10,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 5
+  },
+
+  main_line: { fontFamily: 'Roboto-Bold', fontSize: 14 },
+
+  sub_line: { fontFamily: 'Roboto-Light', fontSize: 12 },
+
+  text_container: { marginLeft: 15 },
+
+  content_container: { flexDirection: 'row', alignItems: 'center' },
 });
