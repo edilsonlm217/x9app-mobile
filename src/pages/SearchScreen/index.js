@@ -29,7 +29,6 @@ export default function SearchScreen() {
         }}
       >
         <View style={{
-          backgroundColor: '#FFFFFF',
           borderRadius: 5,
           borderColor: '#707070',
           borderWidth: StyleSheet.hairlineWidth,
@@ -42,6 +41,8 @@ export default function SearchScreen() {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: 10,
+              borderRadius: 5,
+              backgroundColor: '#FFFFFF',
             }}
           >
             <Text>Edilson Rocha Lima</Text>
