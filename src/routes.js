@@ -8,6 +8,7 @@ import { store } from './store/store';
 import Dashboard from './pages/Dashboard/index';
 import LoginScreen from './pages/LoginScreen/index';
 import SearchScreen from './pages/SearchScreen/index';
+import ClientDetails from './pages/ClientDetails/index';
 import DefaultersScreen from './pages/DefaultersScreen/index';
 import ClientInfoScreen from './pages/ClientInfoScreen/index';
 import ClientAddressScreen from './pages/ClientAddressScreen/index';
@@ -133,6 +134,24 @@ function SignedStack() {
             fontFamily: 'Roboto-Bold',
           },
         }}
+      />
+
+      <Stack.Screen
+        name="ClientDetails"
+        component={ClientDetails}
+        options={({ route }) => ({
+          title: route.params.name,
+          headerStyle: {
+            backgroundColor: '#F43C08',
+          },
+          headerTintColor: '#FFF',
+          headerTransparent: false,
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            fontSize: 16,
+            marginLeft: -20,
+          },
+        })}
       />
     </Stack.Navigator>
   );
